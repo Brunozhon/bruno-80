@@ -282,6 +282,9 @@ int main() {
     static keyCodeS { 22 }\n\
     static keyCodeD { 7 }\n\
     \n\
+    static screenHeight { 128 }\n\
+    static screenWidth { 256 }\n\
+    \n\
     foreign static draw(x, y, r, g, b)\n\
     foreign static drawString(x, y, text, r, g, b)\n\
     foreign static clearScreen()\n\
