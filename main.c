@@ -144,13 +144,13 @@ void drawString(WrenVM* vm) {
 
         uint8_t* bitmap = letters[c - 32];
 
-        for (int row = 0; row < 12; row++) {
+        for (int row = 0; row < 13; row++) {
             for (int col = 0; col < 8; col++) {
                 // Check if the bit for the current pixel is set
                 if (bitmap[row] & (1 << (8 - col - 1))) {
                     // Set pixel in the surface at (x + col, y + row)
                     if (x + col >= 0 && x + col < WIDTH && y + row >= 0 && y + row < HEIGHT) {
-                        framebuffer[x + col + i * 9][y + 12 - row] = (r << 24) + (g << 16) + (b << 8);
+                        framebuffer[x + col + i * 9][y + 13 - row] = (r << 24) + (g << 16) + (b << 8);
                     }
                 }
             }
