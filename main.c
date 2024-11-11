@@ -1,6 +1,6 @@
 #include <SDL2/SDL.h>
 #include "wren.h"
-// x
+
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -68,6 +68,31 @@ void errorFn(WrenVM* vm, WrenErrorType errorType,
   }
 }
 
+char* readFile(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        perror("Failed to open file");
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char* buffer = (char*)malloc(fileSize + 1);
+    if (!buffer) {
+        perror("Failed to allocate memory");
+        fclose(file);
+        return NULL;
+    }
+
+    fread(buffer, 1, fileSize, file);
+    buffer[fileSize] = '\0';
+    fclose(file);
+
+    return buffer;
+}
+
 int main() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("Could not initialize SDL: %s\n", SDL_GetError());
@@ -98,7 +123,14 @@ int main() {
 }"
     );
 
-    wrenInterpret(vm, "main", "Bruno80.draw(1, 2, 255, 0, 0)");
+    char* script = readFile("bruno80/main.wren");
+    if (script) {
+        WrenInterpretResult result = wrenInterpret(vm, "main", script);
+        if (result != WREN_RESULT_SUCCESS) {
+            fprintf(stderr, "Failed to interpret Wren script");
+        }
+        free(script);
+    }
 
     SDL_Event e;
     bool running = true;
@@ -112,7 +144,7 @@ int main() {
     
             for (int y = 0; y < HEIGHT; y++) {
                 for (int x = 0; x < WIDTH; x++) {
-                    int color = framebuffer[x][y];  // Assuming `framebuffer[x][y]` holds an RGB or grayscale color
+                    int color = framebuffer[x][y];
                     pixels[y * WIDTH + x] = color;
                 }
             }
