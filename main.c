@@ -158,6 +158,23 @@ void drawString(WrenVM* vm) {
     }
 }
 
+void clearScreen(WrenVM* vm) {
+    memset(framebuffer, 0, sizeof(framebuffer));
+}
+
+void getKey(WrenVM* vm) {
+    const uint8_t* state = SDL_GetKeyboardState(NULL);
+
+    for (int i = 0; i < SDL_NUM_SCANCODES; i++) {
+        if (state[i]) {
+            wrenSetSlotDouble(vm, 0, i);
+            return;
+        }
+    }
+
+    wrenSetSlotDouble(vm, 0, -1);
+}
+
 WrenForeignMethodFn bindForeignMethod(
     WrenVM* vm,
     const char* module,
@@ -172,6 +189,12 @@ WrenForeignMethodFn bindForeignMethod(
             }
             if (isStatic && strcmp(signature, "drawString(_,_,_,_,_,_)") == 0) {
                 return drawString;
+            }
+            if (isStatic && strcmp(signature, "clearScreen()") == 0) {
+                return clearScreen;
+            }
+            if (isStatic && strcmp(signature, "getKey()") == 0) {
+                return getKey;
             }
         }
     }
@@ -254,8 +277,15 @@ int main() {
         vm,
         "main",
         "class Bruno80 {\n\
+    static keyCodeW { 26 }\n\
+    static keyCodeA { 4 }\n\
+    static keyCodeS { 22 }\n\
+    static keyCodeD { 7 }\n\
+    \n\
     foreign static draw(x, y, r, g, b)\n\
     foreign static drawString(x, y, text, r, g, b)\n\
+    foreign static clearScreen()\n\
+    foreign static getKey()\n\
 }"
     );
 
@@ -267,6 +297,11 @@ int main() {
         }
         free(script);
     }
+
+    wrenEnsureSlots(vm, 1);
+    wrenGetVariable(vm, "main", "Game", 0);
+    WrenHandle* class = wrenGetSlotHandle(vm, 0);
+    WrenHandle* update = wrenMakeCallHandle(vm, "update()");
 
     SDL_Event e;
     bool running = true;
@@ -290,9 +325,12 @@ int main() {
             SDL_RenderCopy(renderer, texture, NULL, NULL);
             SDL_RenderPresent(renderer);
 
+        wrenSetSlotHandle(vm, 0, class);
+        wrenCall(vm, update);
         SDL_Delay(16);
     }
 
+    wrenReleaseHandle(vm, class);
     wrenFreeVM(vm);
 
     return 0;
