@@ -281,6 +281,10 @@ int main() {
     static keyCodeA { 4 }\n\
     static keyCodeS { 22 }\n\
     static keyCodeD { 7 }\n\
+    static keyCodeUp { 82 }\n\
+    static keyCodeDown { 81 }\n\
+    static keyCodeLeft { 80 }\n\
+    static keyCodeRight { 79 }\n\
     \n\
     static screenHeight { 128 }\n\
     static screenWidth { 256 }\n\
