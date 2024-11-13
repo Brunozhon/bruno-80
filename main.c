@@ -257,7 +257,7 @@ int main() {
         return 1;
     }
 
-    SDL_Window* window = SDL_CreateWindow("Fantasy Computer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * 4, HEIGHT * 4, SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow("Bruno-80", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH * 4, HEIGHT * 4, SDL_WINDOW_SHOWN);
     if (!window) {
         printf("Could not create window: %s\n", SDL_GetError());
         return 1;
@@ -301,6 +301,7 @@ int main() {
         WrenInterpretResult result = wrenInterpret(vm, "main", script);
         if (result != WREN_RESULT_SUCCESS) {
             fprintf(stderr, "Failed to interpret Wren script");
+            return 1;
         }
         free(script);
     }
